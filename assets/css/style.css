@@ -1,0 +1,76 @@
+html,body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#coinsContainer{
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+    margin: 0 auto;
+}
+
+nav {
+    width: 90%;
+    margin: auto;
+    border-bottom: 1px solid black; 
+    text-align: center;
+}
+
+.coin {
+    border: 1px black solid;
+    flex:1 1 33.33%;
+    box-sizing: border-box;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 480px) {
+    .coin {
+      flex: 1 1 100%;        
+    }   
+}
+
+#reports, #about {
+    display: none;
+}
+
+button {
+    
+   
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.moreInfoContainer{
+    margin: none;
+    text-align: center;
+    display: none;
+    border: 1px solid black;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #d20d0d;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+    } 
