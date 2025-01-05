@@ -1,42 +1,64 @@
 "use strict";
 
 (async () => {
-    const cacheKey = 'coinCache';
-    const cacheDuration = 120000; // 2 minutes 
-
-    // Load cache from local storage
+    
     const loadCache = () => {
-        const cache = localStorage.getItem(cacheKey);
+        const cache = localStorage.getItem('coinCache');
         return cache ? JSON.parse(cache) : {};
     };
 
-    // Save cache to local storage
-    const saveCache = (cache) => {
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
+    const saveCache = cache => {
+        localStorage.setItem('coinCache', JSON.stringify(cache));
     };
 
     let cache = loadCache(); // Initialize cache
 
+    const coinsSectionDom= document.getElementById(`coinsSection`)
+    const coinsContainerDom = document.getElementById(`coinsContainer`)
+    const reportsContainerDom = document.getElementById(`reportsContainer`)
+    const aboutContainerDom = document.getElementById(`aboutContainer`)
+
     // show/hide tabs
     document.getElementById('navCoins').addEventListener('click', () => {
-        document.getElementById('coinsContainer').style.display = 'flex';
-        document.getElementById('reports').style.display = 'none';
-        document.getElementById('about').style.display = 'none';
+        reportsContainerDom.style.display = 'none';
+        aboutContainerDom.style.display = 'none';
+        
+        // Create the loader span dynamically and append to coinsSection
+        const loaderSpan = document.createElement('span');
+        loaderSpan.className = 'loader';
+        loaderSpan.id = 'coinsLoader';
+        coinsSectionDom.appendChild(loaderSpan);
+    
+        loaderSpan.style.display = 'inline-block';
+    
+        setTimeout(() => {
+            coinsContainerDom.style.display = 'flex';
+            document.getElementById(`search`).style.display = 'inline-block';
+            document.getElementById(`searchBtn`).style.display = 'inline-block';
+            loaderSpan.style.display = 'none'; // Hide the loader
+        }, 0.0001);
+           
     });
+    
 
     document.getElementById('navReports').addEventListener('click', () => {
-        document.getElementById('coinsContainer').style.display = 'none';
-        document.getElementById('reports').style.display = 'block';
-        document.getElementById('about').style.display = 'none';
+       
+        coinsContainerDom.style.display = 'none';
+        reportsContainerDom.style.display = 'block';
+        aboutContainerDom.style.display = 'none';
+        document.getElementById(`search`).style.display = `none`;
+        document.getElementById(`searchBtn`).style.display = `none`;
     });
 
     document.getElementById('navAbout').addEventListener('click', () => {
-        document.getElementById('coinsContainer').style.display = 'none';
-        document.getElementById('reports').style.display = 'none';
-        document.getElementById('about').style.display = 'block';
+        coinsContainerDom.style.display = 'none';
+        reportsContainerDom.style.display = 'none';
+        aboutContainerDom.style.display = 'block';
+        document.getElementById(`search`).style.display = `none`;
+        document.getElementById(`searchBtn`).style.display = `none`;
     });
 
-    // api call + retry if failed
+       // api call + retry if failed
     const getData = (url) => fetch(url).then(response => response.json());
     const fetchRetry = async (url) => {
         let isSuccess = false;
@@ -55,29 +77,48 @@
     const getAllCoins = async () => getData('assets/json/coins.json');
     const getSingleCoin = async (coin) => fetchRetry(`https://api.coingecko.com/api/v3/coins/${coin}`);
     const getGraphData = async (coins) => getData(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${coins.join(',')}&tsyms=USD`);
+     
+   
+
+    // coins tab stuff
+    
+    coinsContainerDom.innerHTML += `<span class="loader" id="coinsLoader"></span>`;
 
     const coins = await getAllCoins();
 
+    // coins.splice(10000, Infinity)
+    
     // generate coins tab html
-    const html = coins.splice(0, 6)
-        .map(coin => `
-            <div class="coin">
+    const coinsHtml = coins.map(coin => `
+            <div class="coin" id="container${coin.id}">
                 <button class="toggle-button" id="${coin.id}">add</button>
-                <h3>${coin.id}</h3>
-                <p>${coin.name}</p>
+                <h2>${coin.symbol}</h2>
+                <p>${coin.id}</p>
                 <button class="info-button" id="${coin.id}">more info</button>
                 <div id="${coin.id}Info" class="moreInfoContainer" style="display: none;"></div>
             </div>
-        `)
-        .join('');
+        `).join(''); 
+        
 
     // generate coins tab
-    document.getElementById('coinsContainer').innerHTML = html;
+    coinsContainerDom.innerHTML +=  coinsHtml;
     
+    document.getElementById(`coinsLoader`).style.display= `none`;
+
+    
+    // search bar
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+        const searchValue = document.getElementById('search').value;
+        const searchResult = coins.filter(coin => coin.symbol === searchValue || !searchValue);
+        const nonSearchResult = coins.filter(coin => coin.symbol !== searchValue);
+        searchResult.forEach(coin => document.getElementById(`container${coin.id}`).style.display = 'flex');
+        nonSearchResult.forEach(coin => document.getElementById(`container${coin.id}`).style.display = 'none');
+        console.log(searchResult);
+    });
 
     // toggle button stuff
     const toggledArray = [];
-
+    
     document.querySelectorAll('.toggle-button').forEach(button => button.addEventListener('click', async () => {
         if(button.style.backgroundColor === 'blue') {
             button.style.backgroundColor = `grey`;
@@ -87,12 +128,13 @@
             if(toggledArray.length < 5){
                 button.style.backgroundColor = 'blue';
                 button.innerHTML = `remove`;
-                toggledArray.push(button.id);}
-            else{
+                toggledArray.push(button.id);
+            } else {
                 const triggeringButtonId = button.id;
                 // jump window
                 const jumpWindow = document.createElement('div');
                 jumpWindow.className = 'jumpWindow';
+                // jump window content
                 jumpWindow.innerHTML = `
                     <p>only 5 coins can be viewed at a time. </br> Please select a coin to replace:</p>
                     <button id="${toggledArray[0]}" class="jumpWindowButtons">X</button> <span>${toggledArray[0]}</span>
@@ -130,7 +172,6 @@
         console.log(toggledArray);
     }));
 
-
     // generate more info on coins + loading spinner + cache check
     document.querySelectorAll('.info-button').forEach(button => button.addEventListener('click', async () => {
 
@@ -147,7 +188,7 @@
         // Check cache
         const now = Date.now();
         const cachedData = cache[coinId];
-        if (cachedData && (now - new Date(cachedData.timestamp).getTime() < cacheDuration)) {
+        if (cachedData && (now - new Date(cachedData.timestamp).getTime() < 120000)) {
             // Use cached data
             infoContainer.innerHTML = cachedData.data;
         } else {
@@ -169,5 +210,21 @@
             };
             saveCache(cache); // Save updated cache to local storage
         }
-    }));   
+    })); 
+   
+
+    // reports tab stuff
+    reportsContainerDom.innerHTML += `
+        <h1>Reports</h1>
+        <p>Choose up to 5 coins to view their current price in USD, ILS and EUR.</p>
+        <button id="getGraphData">Get Data</button>
+        <div id="graphDataContainer"></div>
+    `;
+
+    // about tab stuff
+    aboutContainerDom.innerHTML += `
+        <h1>About</h1>
+        <p>This is a simple web app that allows you to view information about cryptocurrencies.</p>
+        <p>Developed by Tomer Ognistoff, a 23 y/o aspiring developer as part of John Bryce FullStack Course <img class="face" src="assets/pictures/פרצוף.jpg" alt="פרצוף" /></p>
+        `;
 })();

@@ -8,16 +8,20 @@
     <title>Document</title>
   </head>
   <body>
+    <header>
+      <h1>Crypto Tracker</h1>
+    </header>
     <nav>
       <a href="#" id="navCoins">Coins</a>
       <a href="#" id="navReports">Reports</a>
       <a href="#" id="navAbout">About</a>
+      <input type="text" id="search" placeholder="Enter Coin ID" />
+      <button id="searchBtn">Search</button>
     </nav>
-
     <main id="main">
-      <section id="coinsContainer"></section>
-      <section id="reports">2</section>
-      <section id="about">3</section>
+      <section id="coinsSection"><div id="coinsContainer"></div></section>
+      <section id="reportsContainer"></section>
+      <section id="aboutContainer"></section>
     </main>
   </body>
 </html>
