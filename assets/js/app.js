@@ -58,7 +58,7 @@
         document.getElementById(`searchBtn`).style.display = `none`;
     });
 
-       // api call + retry if failed
+    // api call + retry if failed
     const getData = (url) => fetch(url).then(response => response.json());
     const fetchRetry = async (url) => {
         let isSuccess = false;
@@ -73,25 +73,22 @@
         } while (!isSuccess);
     };
 
-    // const getAllCoins = async () => getData('https://api.coingecko.com/api/v3/coins/list');
-    const getAllCoins = async () => getData('assets/json/coins.json');
+    const getAllCoins = async () => fetchRetry('https://api.coingecko.com/api/v3/coins/list');
     const getSingleCoin = async (coin) => fetchRetry(`https://api.coingecko.com/api/v3/coins/${coin}`);
-    const getGraphData = async (coins) => getData(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${coins.join(',')}&tsyms=USD`);
+    const getGraphData = async (coins) => fetchRetry(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${coins.join(',')}&tsyms=USD`);
      
    
 
     // coins tab stuff
-    
     coinsContainerDom.innerHTML += `<span class="loader" id="coinsLoader"></span>`;
 
     const coins = await getAllCoins();
 
-    // coins.splice(10000, Infinity)
     
     // generate coins tab html
     const coinsHtml = coins.map(coin => `
             <div class="coin" id="container${coin.id}">
-                <button class="toggle-button" id="${coin.id}">add</button>
+                <button class="toggle-button" id="${coin.symbol}">add</button>
                 <h2>${coin.symbol}</h2>
                 <p>${coin.id}</p>
                 <button class="info-button" id="${coin.id}">more info</button>
@@ -111,14 +108,12 @@
         const searchValue = document.getElementById('search').value;
         const searchResult = coins.filter(coin => coin.symbol === searchValue || !searchValue);
         const nonSearchResult = coins.filter(coin => coin.symbol !== searchValue);
-        searchResult.forEach(coin => document.getElementById(`container${coin.id}`).style.display = 'flex');
         nonSearchResult.forEach(coin => document.getElementById(`container${coin.id}`).style.display = 'none');
-        console.log(searchResult);
+        searchResult.forEach(coin => document.getElementById(`container${coin.id}`).style.display = 'flex');
     });
 
     // toggle button stuff
     const toggledArray = [];
-    
     document.querySelectorAll('.toggle-button').forEach(button => button.addEventListener('click', async () => {
         if(button.style.backgroundColor === 'blue') {
             button.style.backgroundColor = `grey`;
@@ -151,7 +146,7 @@
                 `;
                 document.body.appendChild(jumpWindow);
                 // change selected buttons AND close jump window
-                document.querySelectorAll('.jumpWindow button:not(.closeJumpWindow)').forEach(button=> button.addEventListener('click',function() {
+                document.querySelectorAll('.jumpWindow button:not(.closeJumpWindow)').forEach(button=> button.addEventListener('click', function() {
                     const button = document.getElementById(this.id)
                     const triggeringButton = document.getElementById(triggeringButtonId);
                     button.style.backgroundColor = `grey`;
@@ -161,7 +156,6 @@
                     toggledArray.push(triggeringButtonId);
                     triggeringButton.style.backgroundColor = 'blue';
                     triggeringButton.innerHTML = `remove`;
-                    console.log(toggledArray);
                 }));
                 // close jump window without changing selected buttons
                 document.querySelector('.closeJumpWindow').addEventListener('click', () => {
@@ -169,7 +163,6 @@
                 });
             }
         }
-        console.log(toggledArray);
     }));
 
     // generate more info on coins + loading spinner + cache check
@@ -213,18 +206,115 @@
     })); 
    
 
+
+
     // reports tab stuff
     reportsContainerDom.innerHTML += `
         <h1>Reports</h1>
-        <p>Choose up to 5 coins to view their current price in USD, ILS and EUR.</p>
-        <button id="getGraphData">Get Data</button>
+        <p>Choose up to 5 coins to view their current price in USD, updating every 2 seconds.</p>
+        <p>warning: leaving this page will reset the graph!</p>
         <div id="graphDataContainer"></div>
     `;
+    var trace1={
+        x: [],
+        y: [],
+        name: '',
+        type: 'scatter'
+    };
+    
+    var trace2={
+        x: [],
+        y: [],
+        name: '',
+        type: 'scatter'
+    };
+
+    var trace3={
+        x: [],
+        y: [],
+        name: '',
+        type: 'scatter'
+    };
+    
+    var trace4={
+        x: [],
+        y: [],
+        name: '',
+        type: 'scatter'
+    };
+
+    var trace5={
+        x: [],
+        y: [],
+        name: '',
+        type: 'scatter'
+    };
+
+    var layout = {
+        title: 'Coins Price',
+        xaxis: {
+            title: 'Time'
+        },
+        yaxis: {
+            title: 'Price'
+        }
+    };
+
+    let traceArray = [trace1, trace2, trace3, trace4, trace5];
+
+    let intervalID; 
+
+    // graph
+    document.getElementById('navReports').addEventListener('click', () => {
+        // Stop any running interval if there is one
+        if (intervalID) {
+            clearInterval(intervalID);
+        }
+
+        // Reset the graph by clearing the existing data
+        traceArray.forEach(trace => {
+            trace.x = [];
+            trace.y = [];
+            trace.name = '';
+        });
+
+        // Initial plot creation
+        Plotly.newPlot('graphDataContainer', traceArray, layout);
+
+        let timeCounter = 0;
+
+        // Start the new interval
+        intervalID = setInterval(async () => {
+            const graphData = await getGraphData(toggledArray);
+            // console.log(graphData);
+
+            toggledArray.forEach((coinSymbol, index) => {
+                // Ensure the coin symbol is in the correct case (if needed)
+                const coinData = graphData[coinSymbol.toUpperCase()]; //the only place in the project where the api IS case sensitive
+                if (coinData) {
+                    traceArray[index].x.push(timeCounter); // Push time
+                    traceArray[index].y.push(coinData.USD); // Push price
+                    traceArray[index].name = coinSymbol.toUpperCase(); // Assign the coin symbol as the trace name
+                }
+            });
+            timeCounter+=2
+            // Update the plot 
+            Plotly.update('graphDataContainer', {
+                x: traceArray.map(trace => trace.x),
+                y: traceArray.map(trace => trace.y),
+                name: traceArray.map(trace => trace.name)
+            });
+        }, 2000);
+    });
+    
+    
+
+
 
     // about tab stuff
     aboutContainerDom.innerHTML += `
         <h1>About</h1>
         <p>This is a simple web app that allows you to view information about cryptocurrencies.</p>
-        <p>Developed by Tomer Ognistoff, a 23 y/o aspiring developer as part of John Bryce FullStack Course <img class="face" src="assets/pictures/פרצוף.jpg" alt="פרצוף" /></p>
+        <p>Developed by Tomer Ognistoff, a 23 y/o aspiring developer, as part of John Bryce FullStack Course <img class="face" src="assets/pictures/פרצוף.jpg" alt="פרצוף" /></p>
         `;
 })();
