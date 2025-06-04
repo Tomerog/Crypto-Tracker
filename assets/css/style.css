@@ -1,19 +1,25 @@
-html,body{
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background-attachment: fixed;
 }
+
 #reportsContainer {
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 #reportsContainer h1 {
     font-size: 2em;
-    color: #333;
+    color: #2c3e50;
     margin-bottom: 15px;
     text-align: center;
 }
@@ -41,63 +47,103 @@ html,body{
     height: 400px;
     background-color: #fff;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-#reportsContainer, #aboutContainer{
+#reportsContainer,
+#aboutContainer {
     display: none;
 }
 
-#coinsContainer{
+#coinsContainer {
     display: flex;
     flex-wrap: wrap;
     width: 90%;
     margin: 0 auto;
+    gap: 10px;
+    /* Use gap instead of margins on individual coins */
 }
 
 nav {
     width: 90%;
     margin: auto;
-    border-bottom: 1px solid black; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .coin {
-    border: 1px black solid;
-    flex:1 1 33.33%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex: 1 1 calc(33.33% - 7px);
+    /* Adjust for gap */
+    min-width: 280px;
+    /* Minimum width to prevent too narrow coins */
     box-sizing: border-box;
     padding: 15px;
     display: flex;
     flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
 }
 
+.coin:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
+}
 
+.coin h2 {
+    color: #3498db;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
 
-#reports, #about {
+.coin p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+#reports,
+#about {
     display: none;
 }
 
 button {
     padding: 10px;
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-.moreInfoContainer{
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.moreInfoContainer {
     margin: none;
     text-align: center;
     display: none;
-    border: 1px solid black;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    background: rgba(52, 152, 219, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .loader {
     width: 48px;
     height: 48px;
-    border: 5px solid #d20d0d;
-    border-bottom-color: transparent;
+    border: 5px solid #e3e3e3;
+    border-bottom-color: #3498db;
     border-radius: 50%;
     display: inline-block;
     box-sizing: border-box;
@@ -112,68 +158,102 @@ button {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
-} 
+}
 
 .coin {
-        position: relative;
+    position: relative;
 }
-    
+
 .toggle-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: gray;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        width: 70px;
-        text-align: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    width: 70px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+    background-color: #7f8c8d;
 }
 
 @keyframes jump {
-        0% { transform: translate(-50%, -50%) scale(1); }
-        50% { transform: translate(-50%, -50%) scale(1.1); }
-        100% { transform: translate(-50%, -50%) scale(1); }
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 .jumpWindow {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        padding: 20px;
-        border: 2px solid black;
-        z-index: 1000;
-        animation: jump 0.5s ease-in-out;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    padding: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    z-index: 1000;
+    animation: jump 0.5s ease-in-out;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-.jumpWindowButtons{
-        background-color: rgb(134, 134, 233);
-        color: white;
-        height: 30px;
-        width: 30px;
+.jumpWindowButtons {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    height: 30px;
+    width: 30px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
-.face{
+
+.jumpWindowButtons:hover {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+}
+
+.face {
     width: 150px;
-    height: 200px;    
-}    
+    height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
 
 /* Header Styles */
 header {
-    background-color: #4CAF50; /* Green background */
-    padding: 20px;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    padding: 25px 20px;
     text-align: center;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
     color: white;
     font-size: 2.5em;
     margin: 0;
+    font-weight: 300;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
 }
 
 /* Navigation Styles */
@@ -181,62 +261,80 @@ nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #333; /* Dark background for the nav */
-    padding: 10px 0;
-    border-bottom: 2px solid #444;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 nav a {
-    color: white;
+    color: #2c3e50;
     text-decoration: none;
-    padding: 15px 20px;
+    padding: 12px 20px;
     margin: 0 10px;
     font-size: 1.1em;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }
 
 nav a:hover {
-    background-color: #575757; /* Darker shade on hover */
-    border-radius: 5px;
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    transform: translateY(-1px);
 }
 
 /* Search Box Styles */
 #search {
-    padding: 8px 10px;
+    padding: 10px 15px;
     margin: 0 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-size: 1em;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#search:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 #searchBtn {
-    padding: 8px 16px;
-    background-color: #4CAF50;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 #searchBtn:hover {
-    background-color: #45a049; /* Slightly darker green on hover */
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
 /* About Section Styles */
 #aboutContainer {
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     width: 90%;
     margin: 20px auto;
     text-align: center;
+    backdrop-filter: blur(10px);
 }
 
 #aboutContainer h1 {
     font-size: 2.5em;
-    color: #333;
+    color: #2c3e50;
     margin-bottom: 20px;
+    font-weight: 300;
 }
 
 #aboutContainer p {
@@ -254,36 +352,48 @@ nav a:hover {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 #aboutContainer p:last-of-type {
     font-style: italic;
     color: #333;
 }
-@media (max-width: 480px) {
-    .coin{
-      flex: 1 1 100%;        
-    }   
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .coin {
+        flex: 1 1 calc(50% - 5px);
+        /* 2 coins per row on medium screens */
+    }
 }
-@media (max-width: 760px) {
+
+@media (max-width: 768px) {
+    .coin {
+        flex: 1 1 100%;
+        /* 1 coin per row on small screens */
+        min-width: unset;
+    }
+
     nav {
         display: flex;
-        flex-wrap: wrap; /* Allow content to wrap to the next line */
+        flex-wrap: wrap;
         justify-content: center;
-        padding: 10px; /* Adjust padding for smaller screens */
-        width: 100%; /* Ensure the nav takes full width of the screen */
-        box-sizing: border-box; /* Include padding in the width calculation */
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     nav a {
-        padding: 10px 15px; /* Reduce padding for nav links */
-        font-size: 0.9em; /* Slightly smaller font size */
-        margin: 5px 5px; /* Reduce margins to prevent overflow */
+        padding: 10px 15px;
+        font-size: 0.9em;
+        margin: 5px 5px;
     }
 
-    #search, #searchBtn {
-        flex: 1 1 100%; /* Search box takes full width on mobile */
-        margin: 10px 0; /* Add spacing between search and other elements */
+    #search,
+    #searchBtn {
+        flex: 1 1 100%;
+        margin: 10px 0;
         text-align: center;
     }
 }
